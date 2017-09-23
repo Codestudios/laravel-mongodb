@@ -213,21 +213,14 @@ trait HybridRelations
      * @param  string $related
      * @param  string $collection
      * @param  string $foreignKey
-     * @param  string $otherKey
+     * @param  string $relatedPivotKey
      * @param  string $parentKey
      * @param  string $relatedKey
      * @param  string $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany(
-        $related,
-        $collection = null,
-        $foreignKey = null,
-        $otherKey = null,
-        $parentKey = null,
-        $relatedKey = null,
-        $relation = null
-    ) {
+    public function belongsToMany($related, $collection = null, $foreignKey = null, $relatedPivotKey = NULL, $parentKey = NULL, $relatedKey = NULL, $relation = NULL)
+    {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -237,15 +230,7 @@ trait HybridRelations
 
         // Check if it is a relation with an original model.
         if (!is_subclass_of($related, \Jenssegers\Mongodb\Eloquent\Model::class)) {
-            return parent::belongsToMany(
-                $related,
-                $collection,
-                $foreignKey,
-                $otherKey,
-                $parentKey,
-                $relatedKey,
-                $relation
-            );
+            return parent::belongsToMany($related, $collection, $foreignKey, $relatedPivotKey, $parentKey, $relatedKey, $relation);
         }
 
         // First, we'll need to determine the foreign key and "other key" for the
@@ -269,16 +254,7 @@ trait HybridRelations
         // appropriate query constraint and entirely manages the hydrations.
         $query = $instance->newQuery();
 
-        return new BelongsToMany(
-            $query,
-            $this,
-            $collection,
-            $foreignKey,
-            $otherKey,
-            $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(),
-            $relation
-        );
+        return new BelongsToMany($query, $this, $collection, $foreignKey, $relatedPivotKey, $parentKey, $relatedKey, $relation);
     }
 
     /**
